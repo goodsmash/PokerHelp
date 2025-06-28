@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Poker-specific colors */
+  --poker-felt: hsl(120, 60%, 15%);
+  --poker-felt-dark: hsl(120, 60%, 10%);
+  --poker-felt-light: hsl(120, 40%, 20%);
+  --card-red: hsl(0, 70%, 45%);
+  --card-black: hsl(0, 0%, 13%);
+  --chip-gold: hsl(45, 90%, 60%);
+  --chip-red: hsl(0, 70%, 50%);
+  --chip-blue: hsl(210, 70%, 50%);
+  --chip-green: hsl(120, 50%, 40%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background: radial-gradient(circle at 20% 50%, rgba(46, 125, 50, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(46, 125, 50, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, var(--poker-felt-dark) 0%, var(--poker-felt) 50%, var(--poker-felt-dark) 100%);
+    color: white;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .poker-card {
+    @apply bg-white rounded-lg shadow-lg border-2 border-gray-300 transition-all duration-200;
+  }
+  
+  .poker-card:hover {
+    @apply transform -translate-y-1 shadow-xl;
+  }
+  
+  .poker-card-selected {
+    @apply border-yellow-400 bg-yellow-50;
+  }
+  
+  .poker-chip {
+    @apply rounded-full shadow-lg;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  
+  .felt-texture {
+    background: var(--poker-felt);
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(46, 125, 50, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(46, 125, 50, 0.3) 0%, transparent 50%);
+  }
+  
+  .card-suit-red {
+    color: var(--card-red);
+  }
+  
+  .card-suit-black {
+    color: var(--card-black);
+  }
+}
