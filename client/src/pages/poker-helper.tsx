@@ -61,6 +61,28 @@ export default function PokerHelper() {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 py-4 sm:px-4 sm:py-6 mobile-scrollable">
+        {/* Welcome & Tutorial Section */}
+        <div className="mb-6 space-y-4">
+          <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl p-4 sm:p-6 border border-blue-600">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Welcome to PokerHelper!</h2>
+            <p className="text-blue-100 text-sm sm:text-base mb-4">
+              Master Texas Hold'em with our comprehensive strategy guide, hand analysis, and position-based recommendations.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={() => setShowGuide(true)}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition-all mobile-button mobile-touch-target flex-1"
+              >
+                <BookOpen className="h-5 w-5 mr-2" />
+                Open Strategy Guide
+              </Button>
+              <div className="flex-1 text-xs sm:text-sm text-blue-200 self-center">
+                📚 Learn basics, positions, hand rankings, betting strategy & pro tips
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           
           {/* Card Selection & Position */}

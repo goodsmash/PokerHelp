@@ -36,15 +36,35 @@ export default function StartingHandChart({ selectedPosition }: StartingHandChar
     return 'FOLD';
   };
 
-  // Generate hand matrix - proper poker chart layout
+  // Generate proper poker hand matrix
   const ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-  const handMatrix = ranks.map((rank1, i) =>
-    ranks.map((rank2, j) => {
-      if (i === j) return rank1 + rank1; // Pocket pairs on diagonal
-      if (i < j) return rank1 + rank2 + "s"; // Suited above diagonal
-      return rank2 + rank1 + "o"; // Offsuit below diagonal
-    })
-  );
+  
+  // Create the 13x13 matrix correctly
+  const createHandMatrix = () => {
+    const matrix = [];
+    for (let i = 0; i < 13; i++) {
+      const row = [];
+      for (let j = 0; j < 13; j++) {
+        const rank1 = ranks[i];
+        const rank2 = ranks[j];
+        
+        if (i === j) {
+          // Pocket pairs (diagonal)
+          row.push(rank1 + rank1);
+        } else if (i < j) {
+          // Suited hands (upper triangle)
+          row.push(rank1 + rank2 + "s");
+        } else {
+          // Offsuit hands (lower triangle)
+          row.push(rank2 + rank1 + "o");
+        }
+      }
+      matrix.push(row);
+    }
+    return matrix;
+  };
+  
+  const handMatrix = createHandMatrix();
 
   return (
     <Card className="bg-green-800 border-green-600 p-4 sm:p-6">
@@ -113,20 +133,30 @@ export default function StartingHandChart({ selectedPosition }: StartingHandChar
         <div className="text-sm text-white mb-2 font-medium">
           {activeChartPosition} Opening Range ({chartData.percentage}% - {chartData.combos} combos)
         </div>
-        <div className="mobile-card-selector overflow-x-auto">
-          <div className="grid grid-cols-13 gap-1 min-w-max">
-            {handMatrix.map((row, i) =>
-              row.map((hand, j) => (
+        <div className="overflow-x-auto bg-gray-900 rounded-lg p-3">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(13, 1fr)', gap: '2px', minWidth: '350px' }}>
+            {handMatrix.flat().map((hand, index) => {
+              const handColor = getHandColor(hand);
+              const handStrength = getHandStrength(hand);
+              return (
                 <div
-                  key={`${i}-${j}`}
-                  className={`${getHandColor(hand)} rounded aspect-square flex flex-col items-center justify-center font-bold text-xs sm:text-sm border-2 transition-all cursor-pointer hover:scale-105 mobile-touch-target`}
-                  title={`${hand} - ${getHandStrength(hand)}`}
+                  key={index}
+                  className={`${handColor} rounded flex items-center justify-center font-bold border transition-all cursor-pointer hover:scale-110 active:scale-95`}
+                  style={{ 
+                    width: '25px', 
+                    height: '25px',
+                    fontSize: '9px'
+                  }}
+                  title={`${hand} - ${handStrength}`}
                 >
-                  <div className="text-xs font-bold">{hand}</div>
+                  {hand}
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
+        </div>
+        <div className="text-xs text-green-200 mt-2">
+          💡 Tip: Green = RAISE, Yellow = CALL, Gray = FOLD
         </div>
       </div>
       
