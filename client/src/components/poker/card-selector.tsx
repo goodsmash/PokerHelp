@@ -94,84 +94,123 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
         ))}
       </div>
 
-      {/* Quick Card Selection */}
+      {/* Quick Premium Hands Selection */}
       {!showFullGrid && (
         <div className="space-y-4">
           <div className="text-center">
+            <h3 className="text-sm font-medium text-white mb-3">Quick Select Premium Hands</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              {[
+                { hand: "AA", label: "Pocket Aces", color: "bg-red-600 hover:bg-red-500" },
+                { hand: "KK", label: "Pocket Kings", color: "bg-red-600 hover:bg-red-500" },
+                { hand: "QQ", label: "Pocket Queens", color: "bg-orange-600 hover:bg-orange-500" },
+                { hand: "JJ", label: "Pocket Jacks", color: "bg-orange-600 hover:bg-orange-500" },
+                { hand: "AKs", label: "Ace King Suited", color: "bg-green-600 hover:bg-green-500" },
+                { hand: "AQs", label: "Ace Queen Suited", color: "bg-green-600 hover:bg-green-500" },
+                { hand: "AKo", label: "Ace King Offsuit", color: "bg-yellow-600 hover:bg-yellow-500" },
+                { hand: "AQo", label: "Ace Queen Offsuit", color: "bg-yellow-600 hover:bg-yellow-500" }
+              ].map((item) => (
+                <Button
+                  key={item.hand}
+                  className={`${item.color} text-white font-bold text-sm p-3 mobile-button mobile-touch-target`}
+                  onClick={() => {
+                    clearCards(); // Clear existing selection first
+                    setTimeout(() => {
+                      const rank1 = item.hand[0];
+                      const rank2 = item.hand[1];
+                      const suited = item.hand.includes('s');
+                      
+                      if (rank1 === rank2) {
+                        // Pocket pair - different suits
+                        handleCardSelect(rank1, "♠", getRankValue(rank1));
+                        setTimeout(() => handleCardSelect(rank2, "♥", getRankValue(rank2)), 100);
+                      } else {
+                        // Different ranks
+                        const suit1 = "♠";
+                        const suit2 = suited ? "♣" : "♥"; // Use clubs for suited, hearts for offsuit
+                        handleCardSelect(rank1, suit1, getRankValue(rank1));
+                        setTimeout(() => handleCardSelect(rank2, suit2, getRankValue(rank2)), 100);
+                      }
+                    }, 50);
+                  }}
+                  title={item.label}
+                >
+                  <div className="text-center">
+                    <div className="text-lg font-bold">{item.hand}</div>
+                    <div className="text-xs opacity-75 hidden sm:block">{item.label.split(' ')[1]}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+            
             <Button 
               onClick={() => setShowFullGrid(true)}
               variant="outline"
-              className="mb-4"
+              className="bg-blue-600 hover:bg-blue-500 text-white border-blue-500 mobile-button"
             >
+              <span className="mr-2">🃏</span>
               Show All Cards
             </Button>
-          </div>
-          
-          {/* Premium hands quick select */}
-          <div className="grid grid-cols-4 gap-2">
-            {["AA", "KK", "QQ", "JJ", "AKs", "AQs", "AJs", "ATs"].map((hand) => (
-              <Button
-                key={hand}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-                onClick={() => {
-                  // Handle premium hand selection
-                  const rank1 = hand[0];
-                  const rank2 = hand[1];
-                  const suited = hand.includes('s');
-                  
-                  if (rank1 === rank2) {
-                    // Pocket pair
-                    handleCardSelect(rank1, "♠", getRankValue(rank1));
-                    handleCardSelect(rank2, "♥", getRankValue(rank2));
-                  } else {
-                    // Different ranks
-                    const suit1 = "♠";
-                    const suit2 = suited ? "♠" : "♥";
-                    handleCardSelect(rank1, suit1, getRankValue(rank1));
-                    handleCardSelect(rank2, suit2, getRankValue(rank2));
-                  }
-                }}
-              >
-                {hand}
-              </Button>
-            ))}
           </div>
         </div>
       )}
 
-      {/* Full Card Grid */}
+      {/* Enhanced Full Card Grid */}
       {showFullGrid && (
-        <>
-          <div className="grid grid-cols-13 gap-1 text-xs mb-4">
-            {suits.map((suit) => 
-              ranks.map((rank) => (
-                <button
-                  key={`${rank}${suit.symbol}`}
-                  className={`poker-card aspect-square flex flex-col items-center justify-center transition-colors text-xs ${
-                    isCardSelected(rank, suit.symbol) 
-                      ? 'poker-card-selected' 
-                      : 'hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleCardSelect(rank, suit.symbol, getRankValue(rank))}
-                >
-                  <span className="font-bold text-black">{rank}</span>
-                  <span className={suit.color}>{suit.symbol}</span>
-                </button>
-              ))
-            )}
+        <div className="space-y-4">
+          <div className="text-center">
+            <h3 className="text-sm font-medium text-white mb-3">Select Individual Cards</h3>
+            <p className="text-xs text-green-200 mb-3">Tap cards to select your hole cards (max 2)</p>
           </div>
           
-          <Button 
-            onClick={() => setShowFullGrid(false)}
-            variant="outline"
-            size="sm"
-            className="w-full mb-2"
-          >
-            Hide Grid
-          </Button>
-        </>
+          {/* Suit-organized card selection */}
+          <div className="space-y-3">
+            {suits.map((suit) => (
+              <div key={suit.name} className="bg-green-700 rounded-lg p-3">
+                <div className="flex items-center mb-2">
+                  <suit.icon className={`h-4 w-4 mr-2 ${suit.color}`} />
+                  <span className="text-sm font-medium text-white capitalize">{suit.name}</span>
+                </div>
+                <div className="grid grid-cols-13 gap-1">
+                  {ranks.map((rank) => (
+                    <button
+                      key={`${rank}${suit.symbol}`}
+                      className={`poker-card aspect-square flex flex-col items-center justify-center transition-all text-xs mobile-touch-target no-zoom ${
+                        isCardSelected(rank, suit.symbol) 
+                          ? 'poker-card-selected border-2 border-yellow-400 transform scale-110' 
+                          : 'hover:bg-gray-100 hover:scale-105'
+                      }`}
+                      onClick={() => handleCardSelect(rank, suit.symbol, getRankValue(rank))}
+                      disabled={selectedCards.length >= 2 && !isCardSelected(rank, suit.symbol)}
+                    >
+                      <span className="font-bold text-black text-xs">{rank}</span>
+                      <span className={`${suit.color} text-xs`}>{suit.symbol}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowFullGrid(false)}
+              variant="outline"
+              size="sm"
+              className="flex-1 bg-green-600 hover:bg-green-500 text-white border-green-500"
+            >
+              ← Back to Quick Select
+            </Button>
+            <Button 
+              onClick={clearCards}
+              variant="outline"
+              size="sm"
+              className="bg-red-600 hover:bg-red-500 text-white border-red-500"
+            >
+              Clear All
+            </Button>
+          </div>
+        </div>
       )}
       
       <Button 

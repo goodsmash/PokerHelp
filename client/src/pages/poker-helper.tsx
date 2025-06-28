@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Spade, Calculator, BarChart3, Settings } from "lucide-react";
+import { Spade, Calculator, BarChart3, Settings, BookOpen, X } from "lucide-react";
 import CardSelector from "@/components/poker/card-selector";
 import PositionSelector from "@/components/poker/position-selector";
 import HandAnalysis from "@/components/poker/hand-analysis";
 import StartingHandChart from "@/components/poker/starting-hand-chart";
 import ActionRecommendation from "@/components/poker/action-recommendation";
 import HandRangeAnalyzer from "@/components/poker/hand-range-analyzer";
+import PokerGuide from "@/components/poker/poker-guide";
 import { analyzeHand, getRecommendation } from "@/lib/poker-engine";
 import type { Card as PokerCard } from "@shared/schema";
 
 export default function PokerHelper() {
   const [selectedCards, setSelectedCards] = useState<PokerCard[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<string>("UTG");
+  const [showGuide, setShowGuide] = useState(false);
   
   const analysis = selectedCards.length === 2 ? analyzeHand(selectedCards) : null;
   const recommendation = analysis ? getRecommendation(selectedCards, selectedPosition) : null;
@@ -34,6 +36,15 @@ export default function PokerHelper() {
             <span className="text-sm text-green-100 hidden sm:inline">Texas Hold'em Strategy</span>
           </div>
           <nav className="flex items-center space-x-1 sm:space-x-4">
+            <Button 
+              onClick={() => setShowGuide(!showGuide)}
+              variant="secondary" 
+              size="sm" 
+              className="bg-blue-600 hover:bg-blue-500 mobile-button mobile-touch-target text-white border-blue-500"
+            >
+              <BookOpen className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Guide</span>
+            </Button>
             <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500 mobile-button mobile-touch-target hidden sm:flex">
               <BarChart3 className="h-4 w-4 mr-1" />
               Charts
@@ -104,33 +115,68 @@ export default function PokerHelper() {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-12 bg-green-800 rounded-xl p-6 border border-green-600">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-white">
+        {/* Guide Modal Overlay */}
+        {showGuide && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-start justify-center p-4 mobile-scrollable overflow-y-auto">
+            <div className="relative w-full max-w-4xl mt-4 mb-8">
+              <Button
+                onClick={() => setShowGuide(false)}
+                className="absolute -top-2 -right-2 z-10 bg-red-600 hover:bg-red-500 text-white rounded-full p-2 mobile-touch-target"
+                size="sm"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <PokerGuide />
+            </div>
+          </div>
+        )}
+
+        {/* Footer - Hidden on mobile for better UX */}
+        <footer className="hidden sm:block mt-8 sm:mt-12 bg-green-800 rounded-xl p-4 sm:p-6 border border-green-600">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-white">
             <div>
-              <h3 className="font-bold mb-3 text-yellow-400">Strategy Resources</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">BSS Starting Hand Charts</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Position Play Guide</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Pre-flop Strategy</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Hand Range Analysis</a></li>
+              <h3 className="font-bold mb-3 text-yellow-400 text-sm sm:text-base">Strategy Resources</h3>
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li><button onClick={() => setShowGuide(true)} className="hover:text-yellow-400 transition-colors text-left">BSS Starting Hand Charts</button></li>
+                <li><button onClick={() => setShowGuide(true)} className="hover:text-yellow-400 transition-colors text-left">Position Play Guide</button></li>
+                <li><button onClick={() => setShowGuide(true)} className="hover:text-yellow-400 transition-colors text-left">Pre-flop Strategy</button></li>
+                <li><button onClick={() => setShowGuide(true)} className="hover:text-yellow-400 transition-colors text-left">Hand Range Analysis</button></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-yellow-400">Tools</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Odds Calculator</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Equity Calculator</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Range vs Range</a></li>
-                <li><a href="#" className="hover:text-yellow-400 transition-colors">Hand History Analyzer</a></li>
+              <h3 className="font-bold mb-3 text-yellow-400 text-sm sm:text-base">Features</h3>
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li><span className="text-green-200">✓ Hand Analysis</span></li>
+                <li><span className="text-green-200">✓ Position Strategy</span></li>
+                <li><span className="text-green-200">✓ Starting Hand Charts</span></li>
+                <li><span className="text-green-200">✓ Action Recommendations</span></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-yellow-400">About</h3>
-              <p className="text-sm mb-4">PokerHelper implements BSS (Big Stack Strategy) recommendations based on established poker strategy principles from PokerStrategy.com.</p>
+              <h3 className="font-bold mb-3 text-yellow-400 text-sm sm:text-base">About</h3>
+              <p className="text-xs sm:text-sm mb-4">PokerHelper implements BSS (Big Stack Strategy) recommendations based on established poker strategy principles. Perfect for beginners and intermediate players.</p>
+              <Button 
+                onClick={() => setShowGuide(true)}
+                className="bg-blue-600 hover:bg-blue-500 text-white border-blue-500 text-xs"
+                size="sm"
+              >
+                <BookOpen className="h-3 w-3 mr-1" />
+                Learn More
+              </Button>
             </div>
           </div>
         </footer>
+
+        {/* Mobile-specific call-to-action */}
+        <div className="sm:hidden mt-6 text-center">
+          <Button 
+            onClick={() => setShowGuide(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white border-blue-500 mobile-button mobile-touch-target"
+          >
+            <BookOpen className="h-4 w-4 mr-2" />
+            Open Strategy Guide
+          </Button>
+        </div>
       </main>
     </div>
   );
