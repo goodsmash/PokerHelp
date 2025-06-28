@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Diamond, Club, Spade, RotateCcw } from "lucide-react";
+import { Heart, Diamond, Club, Spade, RotateCcw, Shuffle, Star, Grid3X3 } from "lucide-react";
 import type { Card as PokerCard } from "@shared/schema";
 
 const suits = [
@@ -13,29 +13,65 @@ const suits = [
 
 const ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
 
+// Quick select premium hands
+const premiumHands = [
+  { name: "Pocket Aces", cards: [{ rank: "A", suit: "♠" }, { rank: "A", suit: "♥" }], tier: "premium" },
+  { name: "Pocket Kings", cards: [{ rank: "K", suit: "♠" }, { rank: "K", suit: "♥" }], tier: "premium" },
+  { name: "Pocket Queens", cards: [{ rank: "Q", suit: "♠" }, { rank: "Q", suit: "♥" }], tier: "premium" },
+  { name: "Ace King Suited", cards: [{ rank: "A", suit: "♠" }, { rank: "K", suit: "♠" }], tier: "strong" },
+  { name: "Ace King Off", cards: [{ rank: "A", suit: "♠" }, { rank: "K", suit: "♥" }], tier: "strong" },
+  { name: "Pocket Jacks", cards: [{ rank: "J", suit: "♠" }, { rank: "J", suit: "♥" }], tier: "strong" },
+  { name: "Ace Queen Suited", cards: [{ rank: "A", suit: "♠" }, { rank: "Q", suit: "♠" }], tier: "good" },
+  { name: "Pocket Tens", cards: [{ rank: "T", suit: "♠" }, { rank: "T", suit: "♥" }], tier: "good" },
+];
+
 interface CardSelectorProps {
   selectedCards: PokerCard[];
   onCardsChange: (cards: PokerCard[]) => void;
 }
 
 export default function CardSelector({ selectedCards, onCardsChange }: CardSelectorProps) {
-  const [showFullGrid, setShowFullGrid] = useState(false);
+  const [selectionMode, setSelectionMode] = useState<'quick' | 'manual'>('quick');
+
+  const handleQuickSelect = (hand: typeof premiumHands[0]) => {
+    const cards = hand.cards.map(card => ({
+      rank: card.rank,
+      suit: card.suit,
+      value: getRankValue(card.rank)
+    }));
+    onCardsChange(cards);
+  };
+
+  const handleRandomHand = () => {
+    const randomHands = [
+      [{ rank: "7", suit: "♠" }, { rank: "2", suit: "♥" }], // Worst hand
+      [{ rank: "9", suit: "♠" }, { rank: "5", suit: "♦" }], // Bad hand
+      [{ rank: "J", suit: "♠" }, { rank: "T", suit: "♦" }], // Decent hand
+      [{ rank: "8", suit: "♠" }, { rank: "8", suit: "♥" }], // Pocket pair
+      [{ rank: "A", suit: "♠" }, { rank: "9", suit: "♦" }], // Ace high
+    ];
+    
+    const randomHand = randomHands[Math.floor(Math.random() * randomHands.length)];
+    const cards = randomHand.map(card => ({
+      rank: card.rank,
+      suit: card.suit,
+      value: getRankValue(card.rank)
+    }));
+    onCardsChange(cards);
+  };
 
   const handleCardSelect = (rank: string, suit: string, value: number) => {
     const newCard: PokerCard = { rank, suit, value };
     
-    // Check if card is already selected
     const isSelected = selectedCards.some(card => 
       card.rank === rank && card.suit === suit
     );
     
     if (isSelected) {
-      // Remove card
       onCardsChange(selectedCards.filter(card => 
         !(card.rank === rank && card.suit === suit)
       ));
     } else if (selectedCards.length < 2) {
-      // Add card if less than 2 selected
       onCardsChange([...selectedCards, newCard]);
     }
   };
@@ -59,6 +95,15 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
     return parseInt(rank);
   };
 
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case 'premium': return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black';
+      case 'strong': return 'bg-gradient-to-r from-green-500 to-green-700 text-white';
+      case 'good': return 'bg-gradient-to-r from-blue-500 to-blue-700 text-white';
+      default: return 'bg-gray-600 text-white';
+    }
+  };
+
   return (
     <Card className="bg-green-800 border-green-600 p-4 sm:p-6">
       <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white flex items-center">
@@ -71,16 +116,16 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
         {[0, 1].map((index) => (
           <div 
             key={index}
-            className={`poker-card w-14 h-20 sm:w-16 sm:h-24 flex flex-col items-center justify-center no-zoom mobile-touch-target ${
+            className={`poker-card w-16 h-24 sm:w-20 sm:h-28 flex flex-col items-center justify-center no-zoom mobile-touch-target ${
               selectedCards[index] ? 'poker-card-selected' : ''
             }`}
           >
             {selectedCards[index] ? (
               <>
-                <span className="text-xl sm:text-2xl font-bold text-black">
+                <span className="text-2xl sm:text-3xl font-bold text-black">
                   {selectedCards[index].rank}
                 </span>
-                <span className={`text-base sm:text-lg ${
+                <span className={`text-xl sm:text-2xl ${
                   selectedCards[index].suit === "♥" || selectedCards[index].suit === "♦" 
                     ? "card-suit-red" : "card-suit-black"
                 }`}>
@@ -88,139 +133,144 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
                 </span>
               </>
             ) : (
-              <span className="text-gray-400 text-xl">?</span>
+              <span className="text-gray-400 text-2xl">?</span>
             )}
           </div>
         ))}
       </div>
 
-      {/* Quick Premium Hands Selection */}
-      {!showFullGrid && (
+      {/* Selection Mode Toggle */}
+      <div className="flex mb-4 bg-gray-700 rounded-lg p-1">
+        <Button
+          onClick={() => setSelectionMode('quick')}
+          className={`flex-1 py-2 px-3 text-sm ${
+            selectionMode === 'quick'
+              ? 'bg-blue-600 text-white'
+              : 'bg-transparent text-gray-300'
+          }`}
+          variant="ghost"
+        >
+          <Star className="h-4 w-4 mr-1" />
+          Quick Select
+        </Button>
+        <Button
+          onClick={() => setSelectionMode('manual')}
+          className={`flex-1 py-2 px-3 text-sm ${
+            selectionMode === 'manual'
+              ? 'bg-blue-600 text-white'
+              : 'bg-transparent text-gray-300'
+          }`}
+          variant="ghost"
+        >
+          <Grid3X3 className="h-4 w-4 mr-1" />
+          Manual Select
+        </Button>
+      </div>
+
+      {/* Quick Select Mode */}
+      {selectionMode === 'quick' && (
         <div className="space-y-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-white mb-3">Quick Select Premium Hands</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-              {[
-                { hand: "AA", label: "Pocket Aces", color: "bg-red-600 hover:bg-red-500" },
-                { hand: "KK", label: "Pocket Kings", color: "bg-red-600 hover:bg-red-500" },
-                { hand: "QQ", label: "Pocket Queens", color: "bg-orange-600 hover:bg-orange-500" },
-                { hand: "JJ", label: "Pocket Jacks", color: "bg-orange-600 hover:bg-orange-500" },
-                { hand: "AKs", label: "Ace King Suited", color: "bg-green-600 hover:bg-green-500" },
-                { hand: "AQs", label: "Ace Queen Suited", color: "bg-green-600 hover:bg-green-500" },
-                { hand: "AKo", label: "Ace King Offsuit", color: "bg-yellow-600 hover:bg-yellow-500" },
-                { hand: "AQo", label: "Ace Queen Offsuit", color: "bg-yellow-600 hover:bg-yellow-500" }
-              ].map((item) => (
+            <p className="text-green-200 text-sm mb-3">
+              Tap any hand to select instantly:
+            </p>
+            
+            {/* Premium Hands Grid */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+              {premiumHands.map((hand, i) => (
                 <Button
-                  key={item.hand}
-                  className={`${item.color} text-white font-bold text-sm p-3 mobile-button mobile-touch-target`}
-                  onClick={() => {
-                    clearCards(); // Clear existing selection first
-                    setTimeout(() => {
-                      const rank1 = item.hand[0];
-                      const rank2 = item.hand[1];
-                      const suited = item.hand.includes('s');
-                      
-                      if (rank1 === rank2) {
-                        // Pocket pair - different suits
-                        handleCardSelect(rank1, "♠", getRankValue(rank1));
-                        setTimeout(() => handleCardSelect(rank2, "♥", getRankValue(rank2)), 100);
-                      } else {
-                        // Different ranks
-                        const suit1 = "♠";
-                        const suit2 = suited ? "♣" : "♥"; // Use clubs for suited, hearts for offsuit
-                        handleCardSelect(rank1, suit1, getRankValue(rank1));
-                        setTimeout(() => handleCardSelect(rank2, suit2, getRankValue(rank2)), 100);
-                      }
-                    }, 50);
-                  }}
-                  title={item.label}
+                  key={i}
+                  onClick={() => handleQuickSelect(hand)}
+                  className={`${getTierColor(hand.tier)} mobile-button mobile-touch-target h-auto py-3 px-2 flex flex-col items-center text-center hover:scale-105 transition-transform`}
+                  variant="outline"
                 >
-                  <div className="text-center">
-                    <div className="text-lg font-bold">{item.hand}</div>
-                    <div className="text-xs opacity-75 hidden sm:block">{item.label.split(' ')[1]}</div>
+                  <div className="font-bold text-sm">{hand.name.split(' ')[0]} {hand.name.split(' ')[1]}</div>
+                  <div className="text-xs opacity-90 mt-1">{hand.name}</div>
+                  <div className="flex space-x-1 mt-1">
+                    {hand.cards.map((card, j) => (
+                      <span key={j} className="text-xs bg-white text-black px-1 rounded">
+                        {card.rank}{card.suit}
+                      </span>
+                    ))}
                   </div>
                 </Button>
               ))}
             </div>
             
-            <Button 
-              onClick={() => setShowFullGrid(true)}
-              variant="outline"
-              className="bg-blue-600 hover:bg-blue-500 text-white border-blue-500 mobile-button"
-            >
-              <span className="mr-2">🃏</span>
-              Show All Cards
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex justify-center space-x-2">
+              <Button
+                onClick={handleRandomHand}
+                className="bg-purple-600 hover:bg-purple-500 text-white mobile-button mobile-touch-target"
+                variant="outline"
+                size="sm"
+              >
+                <Shuffle className="h-4 w-4 mr-1" />
+                Random Hand
+              </Button>
+              <Button
+                onClick={clearCards}
+                className="mobile-button mobile-touch-target"
+                variant="outline"
+                size="sm"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Enhanced Full Card Grid */}
-      {showFullGrid && (
+      {/* Manual Select Mode */}
+      {selectionMode === 'manual' && (
         <div className="space-y-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-white mb-3">Select Individual Cards</h3>
-            <p className="text-xs text-green-200 mb-3">Tap cards to select your hole cards (max 2)</p>
+            <p className="text-green-200 text-sm mb-3">
+              Select your two hole cards manually:
+            </p>
           </div>
           
-          {/* Suit-organized card selection */}
-          <div className="space-y-3">
-            {suits.map((suit) => (
-              <div key={suit.name} className="bg-green-700 rounded-lg p-3">
-                <div className="flex items-center mb-2">
-                  <suit.icon className={`h-4 w-4 mr-2 ${suit.color}`} />
-                  <span className="text-sm font-medium text-white capitalize">{suit.name}</span>
-                </div>
-                <div className="grid grid-cols-13 gap-1">
-                  {ranks.map((rank) => (
-                    <button
-                      key={`${rank}${suit.symbol}`}
-                      className={`poker-card aspect-square flex flex-col items-center justify-center transition-all text-xs mobile-touch-target no-zoom ${
-                        isCardSelected(rank, suit.symbol) 
-                          ? 'poker-card-selected border-2 border-yellow-400 transform scale-110' 
-                          : 'hover:bg-gray-100 hover:scale-105'
-                      }`}
+          {/* Rank-based selection */}
+          <div className="space-y-2">
+            {ranks.map(rank => (
+              <div key={rank} className="flex items-center space-x-2">
+                <div className="text-white font-bold w-6 text-center text-sm">{rank}</div>
+                <div className="flex space-x-1 flex-1">
+                  {suits.map(suit => (
+                    <Button
+                      key={`${rank}-${suit.symbol}`}
                       onClick={() => handleCardSelect(rank, suit.symbol, getRankValue(rank))}
-                      disabled={selectedCards.length >= 2 && !isCardSelected(rank, suit.symbol)}
+                      className={`flex-1 h-8 text-xs mobile-touch-target ${
+                        isCardSelected(rank, suit.symbol) 
+                          ? 'bg-yellow-500 text-black border-yellow-400' 
+                          : 'bg-gray-700 text-white border-gray-600'
+                      }`}
+                      variant="outline"
                     >
-                      <span className="font-bold text-black text-xs">{rank}</span>
-                      <span className={`${suit.color} text-xs`}>{suit.symbol}</span>
-                    </button>
+                      <span className={`${suit.color} font-bold`}>
+                        {rank}{suit.symbol}
+                      </span>
+                    </Button>
                   ))}
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => setShowFullGrid(false)}
-              variant="outline"
-              size="sm"
-              className="flex-1 bg-green-600 hover:bg-green-500 text-white border-green-500"
-            >
-              ← Back to Quick Select
-            </Button>
-            <Button 
+          <div className="text-center">
+            <Button
               onClick={clearCards}
+              className="mobile-button mobile-touch-target"
               variant="outline"
               size="sm"
-              className="bg-red-600 hover:bg-red-500 text-white border-red-500"
             >
-              Clear All
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Clear Cards
             </Button>
           </div>
         </div>
       )}
-      
-      <Button 
-        onClick={clearCards}
-        variant="default"
-        className="w-full bg-yellow-600 hover:bg-yellow-500 text-green-900 font-bold"
-      >
-        <RotateCcw className="mr-2 h-4 w-4" />
-        Clear Selection
-      </Button>
     </Card>
   );
 }

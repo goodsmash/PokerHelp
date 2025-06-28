@@ -94,7 +94,29 @@ PokerHelper is a full-stack web application designed to assist Texas Hold'em pok
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **June 28, 2025**: Complete card selector redesign for enhanced usability
+  - Added smart quick-select mode with premium hand buttons
+  - Implemented manual selection mode for precise card picking
+  - Added random hand generator for testing different scenarios
+  - Color-coded hand tiers (Premium=Gold, Strong=Green, Good=Blue)
+  - Larger card display with better touch targets for mobile
+  - Toggle between Quick Select and Manual modes
+  - One-tap selection for common hands like AA, KK, AKs, etc.
+
+- **June 28, 2025**: Starting hand chart visual matrix implementation
+  - Fixed chart display from text list to proper 13x13 poker grid
+  - Color-coded recommendations (Green=RAISE, Yellow=CALL, Gray=FOLD)
+  - Mobile-responsive grid with proper sizing
+  - Interactive hover effects and touch feedback
+
+- **June 28, 2025**: Enhanced tutorial integration
+  - Prominent tutorial guide button in welcome section
+  - Comprehensive 6-section poker strategy guide
+  - Mobile-optimized interface with sticky navigation
+
 ## Changelog
 
 Changelog:
-- June 28, 2025. Initial setup
+- June 28, 2025. Initial setup and major UX improvements
