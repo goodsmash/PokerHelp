@@ -19,38 +19,41 @@ export default function PokerHelper() {
   const recommendation = analysis ? getRecommendation(selectedCards, selectedPosition) : null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen no-zoom">
       {/* Header */}
-      <header className="bg-green-800 border-b border-green-600 px-4 py-3">
+      <header className="bg-green-800 border-b border-green-600 px-3 py-2 sm:px-4 sm:py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full p-2 poker-chip">
-              <Spade className="text-green-800 h-6 w-6" />
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full p-1.5 sm:p-2 poker-chip">
+              <Spade className="text-green-800 h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <h1 className="text-2xl font-bold text-white">PokerHelper</h1>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">PokerHelper</h1>
+              <span className="text-xs text-green-100 sm:hidden">Texas Hold'em Strategy</span>
+            </div>
             <span className="text-sm text-green-100 hidden sm:inline">Texas Hold'em Strategy</span>
           </div>
-          <nav className="flex items-center space-x-4">
-            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500">
+          <nav className="flex items-center space-x-1 sm:space-x-4">
+            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500 mobile-button mobile-touch-target hidden sm:flex">
               <BarChart3 className="h-4 w-4 mr-1" />
               Charts
             </Button>
-            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500">
+            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500 mobile-button mobile-touch-target hidden sm:flex">
               <Calculator className="h-4 w-4 mr-1" />
               Odds
             </Button>
-            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500">
+            <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500 mobile-button mobile-touch-target">
               <Settings className="h-4 w-4" />
             </Button>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="max-w-7xl mx-auto px-3 py-4 sm:px-4 sm:py-6 mobile-scrollable">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           
-          {/* Left Column: Card Selection & Position */}
-          <div className="lg:col-span-1 space-y-6">
+          {/* Card Selection & Position */}
+          <div className="md:col-span-2 lg:col-span-1 space-y-4 sm:space-y-6">
             <CardSelector 
               selectedCards={selectedCards}
               onCardsChange={setSelectedCards}
@@ -61,39 +64,39 @@ export default function PokerHelper() {
             />
           </div>
 
-          {/* Middle Column: Analysis & Recommendations */}
-          <div className="lg:col-span-1 space-y-6">
+          {/* Analysis & Recommendations */}
+          <div className="md:col-span-2 lg:col-span-1 space-y-4 sm:space-y-6">
             <HandAnalysis analysis={analysis} />
             <ActionRecommendation recommendation={recommendation} />
           </div>
 
-          {/* Right Column: Charts & Reference */}
-          <div className="lg:col-span-1 space-y-6">
+          {/* Charts & Reference */}
+          <div className="md:col-span-2 lg:col-span-1 space-y-4 sm:space-y-6">
             <StartingHandChart selectedPosition={selectedPosition} />
             <HandRangeAnalyzer selectedPosition={selectedPosition} />
             
-            {/* Quick Stats */}
-            <Card className="bg-green-800 border-green-600 p-6">
-              <h2 className="text-xl font-bold mb-4 text-white flex items-center">
-                <BarChart3 className="text-green-400 mr-2" />
+            {/* Quick Stats - Hidden on mobile for better UX */}
+            <Card className="bg-green-800 border-green-600 p-4 sm:p-6 hidden sm:block">
+              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white flex items-center">
+                <BarChart3 className="text-green-400 mr-2 h-5 w-5 sm:h-6 sm:w-6" />
                 Quick Stats
               </h2>
               
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white">
-                  <span className="text-sm">VPIP Recommended:</span>
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white text-sm">
+                  <span>VPIP Recommended:</span>
                   <span className="font-bold">18-22%</span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white">
-                  <span className="text-sm">PFR Recommended:</span>
+                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white text-sm">
+                  <span>PFR Recommended:</span>
                   <span className="font-bold">15-19%</span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white">
-                  <span className="text-sm">3-bet Range:</span>
+                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white text-sm">
+                  <span>3-bet Range:</span>
                   <span className="font-bold">4-6%</span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white">
-                  <span className="text-sm">Fold to 3-bet:</span>
+                <div className="flex justify-between items-center p-2 bg-green-700 rounded text-white text-sm">
+                  <span>Fold to 3-bet:</span>
                   <span className="font-bold">65-75%</span>
                 </div>
               </div>

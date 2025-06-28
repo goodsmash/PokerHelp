@@ -83,6 +83,10 @@
     @apply transform -translate-y-1 shadow-xl;
   }
   
+  .poker-card:active {
+    @apply transform scale-95;
+  }
+  
   .poker-card-selected {
     @apply border-yellow-400 bg-yellow-50;
   }
@@ -105,5 +109,51 @@
   
   .card-suit-black {
     color: var(--card-black);
+  }
+
+  /* Mobile optimizations */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .mobile-card-grid {
+    touch-action: manipulation;
+  }
+  
+  .mobile-scrollable {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on double tap for game elements */
+  .no-zoom {
+    touch-action: manipulation;
+  }
+  
+  /* Better button press feedback on mobile */
+  .mobile-button:active {
+    @apply transform scale-95;
+    transition: transform 0.1s ease;
+  }
+  
+  /* Improved mobile card selection */
+  .mobile-card-selector {
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(13, minmax(20px, 1fr));
+  }
+  
+  @media (max-width: 640px) {
+    .mobile-card-selector {
+      grid-template-columns: repeat(13, minmax(18px, 1fr));
+      gap: 1px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .mobile-card-selector {
+      grid-template-columns: repeat(13, minmax(16px, 1fr));
+      gap: 1px;
+    }
   }
 }

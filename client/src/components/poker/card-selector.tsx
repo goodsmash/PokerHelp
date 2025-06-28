@@ -60,27 +60,27 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
   };
 
   return (
-    <Card className="bg-green-800 border-green-600 p-6">
-      <h2 className="text-xl font-bold mb-4 text-white flex items-center">
-        <Heart className="text-red-500 mr-2" />
+    <Card className="bg-green-800 border-green-600 p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white flex items-center">
+        <Heart className="text-red-500 mr-2 h-5 w-5 sm:h-6 sm:w-6" />
         Your Hole Cards
       </h2>
       
       {/* Selected Cards Display */}
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex justify-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
         {[0, 1].map((index) => (
           <div 
             key={index}
-            className={`poker-card w-16 h-24 flex flex-col items-center justify-center ${
+            className={`poker-card w-14 h-20 sm:w-16 sm:h-24 flex flex-col items-center justify-center no-zoom mobile-touch-target ${
               selectedCards[index] ? 'poker-card-selected' : ''
             }`}
           >
             {selectedCards[index] ? (
               <>
-                <span className="text-2xl font-bold text-black">
+                <span className="text-xl sm:text-2xl font-bold text-black">
                   {selectedCards[index].rank}
                 </span>
-                <span className={`text-lg ${
+                <span className={`text-base sm:text-lg ${
                   selectedCards[index].suit === "♥" || selectedCards[index].suit === "♦" 
                     ? "card-suit-red" : "card-suit-black"
                 }`}>
@@ -88,7 +88,7 @@ export default function CardSelector({ selectedCards, onCardsChange }: CardSelec
                 </span>
               </>
             ) : (
-              <span className="text-gray-400">?</span>
+              <span className="text-gray-400 text-xl">?</span>
             )}
           </div>
         ))}
