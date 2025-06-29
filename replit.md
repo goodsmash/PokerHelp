@@ -18,7 +18,7 @@ PokerHelper is a full-stack web application designed to assist Texas Hold'em pok
 - **Language**: TypeScript with ES modules
 - **Database ORM**: Drizzle ORM configured for PostgreSQL
 - **Session Storage**: Connect-pg-simple for PostgreSQL session store
-- **Development**: In-memory storage fallback for development
+- **Database**: PostgreSQL with Drizzle ORM for persistent data storage
 
 ### Database Design
 - **Primary Database**: PostgreSQL with Neon serverless
@@ -115,6 +115,12 @@ Preferred communication style: Simple, everyday language.
   - Prominent tutorial guide button in welcome section
   - Comprehensive 6-section poker strategy guide
   - Mobile-optimized interface with sticky navigation
+
+- **June 29, 2025**: Database integration
+  - Added PostgreSQL database with Drizzle ORM
+  - Replaced in-memory storage with persistent database storage
+  - Configured database connection and migration system
+  - User sessions and poker analysis now stored in database
 
 ## Changelog
 
