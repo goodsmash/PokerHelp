@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertPokerSessionSchema } from "@shared/schema";
+import { storage } from "./storage.js";
+import { insertPokerSessionSchema } from "../shared/schema.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Poker session tracking
