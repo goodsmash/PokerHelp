@@ -9,6 +9,7 @@ import StartingHandChart from "@/components/poker/starting-hand-chart";
 import ActionRecommendation from "@/components/poker/action-recommendation";
 import HandRangeAnalyzer from "@/components/poker/hand-range-analyzer";
 import PokerGuide from "@/components/poker/poker-guide";
+import AIPracticeMode from "@/components/poker/ai-practice-mode";
 import { analyzeHand, getRecommendation } from "@/lib/poker-engine";
 import type { Card as PokerCard } from "@shared/schema";
 
@@ -16,6 +17,7 @@ export default function PokerHelper() {
   const [selectedCards, setSelectedCards] = useState<PokerCard[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<string>("UTG");
   const [showGuide, setShowGuide] = useState(false);
+  const [showAIPractice, setShowAIPractice] = useState(false);
   
   const analysis = selectedCards.length === 2 ? analyzeHand(selectedCards) : null;
   const recommendation = analysis ? getRecommendation(selectedCards, selectedPosition) : null;
@@ -44,6 +46,14 @@ export default function PokerHelper() {
             >
               <BookOpen className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">Guide</span>
+            </Button>
+            <Button
+              onClick={() => setShowAIPractice(true)}
+              variant="secondary"
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-500 mobile-button mobile-touch-target text-white border-purple-500"
+            >
+              AI Practice
             </Button>
             <Button variant="secondary" size="sm" className="bg-green-600 hover:bg-green-500 mobile-button mobile-touch-target hidden sm:flex">
               <BarChart3 className="h-4 w-4 mr-1" />
@@ -151,6 +161,10 @@ export default function PokerHelper() {
               <PokerGuide />
             </div>
           </div>
+        )}
+
+        {showAIPractice && (
+          <AIPracticeMode onClose={() => setShowAIPractice(false)} />
         )}
 
         {/* Footer - Hidden on mobile for better UX */}

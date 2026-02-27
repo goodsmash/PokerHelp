@@ -16,11 +16,13 @@ import {
   ChevronRight
 } from 'lucide-react';
 import CardSelector from '@/components/poker/card-selector';
-import { 
-  AIPlayer, 
-  AI_PERSONALITIES, 
+import {
+  AI_PERSONALITIES,
   getAIDecision,
-  calculateHandStrength 
+  calculateHandStrength,
+  createDeck,
+  drawRandomCards,
+  type AIType,
 } from '@/lib/ai-poker-engine';
 import type { Card as PokerCard } from '@shared/schema';
 
@@ -42,50 +44,42 @@ export default function AIPracticeMode({ onClose }: AIPracticeModeProps) {
   const [street, setStreet] = useState<'preflop' | 'flop' | 'turn' | 'river'>('preflop');
   const [handHistory, setHandHistory] = useState<string[]>([]);
   const [stats, setStats] = useState({ handsPlayed: 0, handsWon: 0, profit: 0 });
-
-  // Generate random cards
-  const generateRandomCard = useCallback((): PokerCard => {
-    const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-    const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-    const values: Record<string, number> = {
-      '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8,
-      '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14
-    };
-    
-    const suit = suits[Math.floor(Math.random() * suits.length)];
-    const rank = ranks[Math.floor(Math.random() * ranks.length)];
-    
-    return { suit, rank, value: values[rank] };
-  }, []);
+  const [deck, setDeck] = useState<PokerCard[]>([]);
 
   const dealCards = useCallback(() => {
-    const player = [generateRandomCard(), generateRandomCard()];
-    const ai = [generateRandomCard(), generateRandomCard()];
+    const freshDeck = createDeck();
+    const playerDraw = drawRandomCards(freshDeck, 2);
+    const aiDraw = drawRandomCards(playerDraw.deck, 2);
+
+    const player = playerDraw.drawn;
+    const ai = aiDraw.drawn;
+
     setPlayerCards(player);
     setAiCards(ai);
+    setDeck(aiDraw.deck);
     setCommunityCards([]);
     setStreet('preflop');
     setCurrentBet(10);
-    setPot(20); // Blinds
-    
-    // AI makes decision
+    setPot(20);
+
     const aiStrength = calculateHandStrength(ai, []);
     const aiDecision = getAIDecision(
       selectedAI,
       aiStrength,
-      'BTN', // Button position
-      20, // Pot odds
-      10, // To call
+      'BTN',
+      20,
+      10,
       aiChips,
       []
     );
-    
+
     setHandHistory(prev => [
       ...prev,
       `AI (${AI_PERSONALITIES[selectedAI].name}): ${aiDecision.action.toUpperCase()}${aiDecision.amount ? ` $${aiDecision.amount}` : ''}`,
+      `AI Model: equity=${aiStrength.toFixed(1)}%`,
       `AI Reasoning: ${aiDecision.reasoning}`
     ]);
-  }, [generateRandomCard, selectedAI, aiChips]);
+  }, [selectedAI, aiChips]);
 
   const startGame = () => {
     setGameState('playing');
@@ -114,16 +108,21 @@ export default function AIPracticeMode({ onClose }: AIPracticeModeProps) {
 
   const advanceStreet = () => {
     if (street === 'preflop') {
+      const flopDraw = drawRandomCards(deck, 3);
+      setDeck(flopDraw.deck);
       setStreet('flop');
-      setCommunityCards([generateRandomCard(), generateRandomCard(), generateRandomCard()]);
+      setCommunityCards(flopDraw.drawn);
     } else if (street === 'flop') {
+      const turnDraw = drawRandomCards(deck, 1);
+      setDeck(turnDraw.deck);
       setStreet('turn');
-      setCommunityCards(prev => [...prev, generateRandomCard()]);
+      setCommunityCards(prev => [...prev, ...turnDraw.drawn]);
     } else if (street === 'turn') {
+      const riverDraw = drawRandomCards(deck, 1);
+      setDeck(riverDraw.deck);
       setStreet('river');
-      setCommunityCards(prev => [...prev, generateRandomCard()]);
+      setCommunityCards(prev => [...prev, ...riverDraw.drawn]);
     } else {
-      // Showdown
       showdown();
     }
   };
@@ -369,4 +368,3 @@ export default function AIPracticeMode({ onClose }: AIPracticeModeProps) {
   );
 }
 
-export type AIType = 'tight' | 'loose' | 'aggressive' | 'passive' | 'balanced';
